@@ -1,5 +1,6 @@
 # Databricks Unity Catalog Terraform Quickstart 🌐🚀
 
+
 🌟🔧 This project acts as a helper to install UC with default recommended settings which saves a lot of boilerplate code and brainstorming even before customers use Unity Catalog. 🔧🌟
 
 Welcome to the **databricks-uc-quickstart** repository! This project is dedicated to deploying the Unity Catalog on Databricks using Terraform, which simplifies the initial setup with pre-configured Terraform scripts. Eliminate boilerplate code and reduce the configuration overhead to jumpstart your data governance initiatives efficiently!
