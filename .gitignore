@@ -1,0 +1,8 @@
+*.terraform
+*.tfvars
+*.tfstate
+*.backup
+*.hcl
+*.DS_Store
+.vscode
+*.tfplan
