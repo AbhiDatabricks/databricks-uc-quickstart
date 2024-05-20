@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "uc_policy_doc_ext_loc" {
     condition {
       test     = "ArnEquals"
       variable = "aws:PrincipalArn"
-      values   = ["arn:aws:iam::${var.aws_account_id}:role/${local.prefix}-ext-loc"]
+      values   = ["arn:aws:iam::${var.aws_account_id}:role/${var.storage_prefix}-ext-loc"]
     }
   }
 }
@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "uc_policy_doc_ext_loc" {
 resource "aws_iam_policy" "uc_policy_ext_loc" {
   policy = jsonencode({
     Version = "2012-10-17"
-    Id      = "${local.prefix}-policy-ext-loc"
+    Id      = "${var.storage_prefix}-policy-ext-loc"
     Statement = [
       {
         "Action" : [
@@ -44,8 +44,8 @@ resource "aws_iam_policy" "uc_policy_ext_loc" {
           "s3:GetBucketLocation"
         ],
         "Resource" : [
-          aws_s3_bucket.dev_catalog.arn,
-          "${aws_s3_bucket.dev_catalog.arn}/*"
+          aws_s3_bucket.catalog_bucket.arn,
+          "${aws_s3_bucket.catalog_bucket.arn}/*"
         ],
         "Effect" : "Allow"
       },
@@ -54,22 +54,22 @@ resource "aws_iam_policy" "uc_policy_ext_loc" {
           "sts:AssumeRole"
         ],
         "Resource" : [
-          "arn:aws:iam::${var.aws_account_id}:role/${local.prefix}-ext-loc"
+          "arn:aws:iam::${var.aws_account_id}:role/${var.storage_prefix}-ext-loc"
         ],
         "Effect" : "Allow"
       }
     ]
   })
   tags = merge(var.tags, {
-    Name = "${local.prefix} IAM policy"
+    Name = "${var.storage_prefix} IAM policy"
   })
 }
 
 resource "aws_iam_role" "uc_quickstart_ext_loc" {
-  name                = "${local.prefix}-ext-loc"
+  name                = "${var.storage_prefix}-ext-loc"
   assume_role_policy  = data.aws_iam_policy_document.uc_policy_doc_ext_loc.json
   managed_policy_arns = [aws_iam_policy.uc_policy_ext_loc.arn]
   tags = merge(var.tags, {
-    Name = "${local.prefix} IAM role"
+    Name = "${var.storage_prefix} IAM role"
   })
 }
