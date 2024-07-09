@@ -129,7 +129,7 @@ module "grant_prod" {
 module "grant_dev" {
   source = "./grant"
   catalog_name = "${local.prefix}-${var.catalog_2}"
-  permissions = var.catalog_1_permissions
+  permissions = var.catalog_2_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
   group_3_name = "${local.prefix}-${var.group_3}"
@@ -140,7 +140,7 @@ module "grant_dev" {
 module "grant_sandbox" {
   source = "./grant"
   catalog_name = "${local.prefix}-${var.catalog_3}"
-  permissions = var.catalog_1_permissions
+  permissions = var.catalog_3_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
   group_3_name = "${local.prefix}-${var.group_3}"
