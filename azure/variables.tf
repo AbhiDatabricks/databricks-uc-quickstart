@@ -46,9 +46,9 @@ variable "databricks_token" {
 variable "azure_tenant_id"{
   default = "TenantID"
 }
-variable "azureSP_client_id"{
+variable "databricks_client_id"{
   default = "sp_client_id"
 }
-variable "azureSPclient_secret"{
+variable "databricks_client_secret"{
   default = "sp_client_secret"
 }
