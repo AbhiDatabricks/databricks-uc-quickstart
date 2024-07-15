@@ -28,5 +28,4 @@ provider "databricks" {
   host                        = var.databricks_host
   azure_client_id             = var.databricks_client_id
   azure_client_secret         = var.databricks_client_secret
-  azure_tenant_id             = var.azure_tenant_id
 }
