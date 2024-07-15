@@ -42,3 +42,13 @@ module "catalog" {
   catalog_name     = var.catalog_name
   storage_root     = "s3://${module.infra.bucket_id}/data" # databricks_external_location.uc_external_location.url + storage_path
 }
+
+# module "grant" {
+#   source = "./modules/grant"
+#   providers = {
+#     databricks = databricks
+#   }
+# depends_on = [ module.catalog]
+# catalog_name = var.catalog_name
+# permissions  = var.permissions
+# }
