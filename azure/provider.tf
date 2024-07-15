@@ -26,6 +26,6 @@ provider "azurerm" {
 provider "databricks" {
   alias = "workspace"
   host                        = var.databricks_host
-  azure_client_id             = var.databricks_client_id
-  azure_client_secret         = var.databricks_client_secret
+  client_id             = var.databricks_client_id
+  client_secret         = var.databricks_client_secret
 }
