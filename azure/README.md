@@ -6,5 +6,4 @@
 - Microsoft.ManagedIdentity
 
 2. **Service Principal Permissions**
-- Contributor - Azure Subscription
-- Owner - Resource Group
+- Owner - Azure Subscription
