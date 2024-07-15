@@ -1,4 +1,6 @@
-Pre-requisites
+### Prerequisites
 
-1. Resource Providers
-    
+1. **Microsoft Resource Providers**
+- Microsoft.Databricks
+- Microsoft.Storage
+- Microsoft.ManagedIdentity
