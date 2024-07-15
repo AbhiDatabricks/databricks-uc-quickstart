@@ -1,8 +1,8 @@
-provider "azurerm" {
-  skip_provider_registration = true
-  features {}
+# provider "azurerm" {
+#   skip_provider_registration = true
+#   features {}
 #   subscription_id = var.subscription_id
-}
+# }
 
 # provider "azapi" {
 #   subscription_id = var.subscription_id
@@ -22,10 +22,20 @@ provider "azurerm" {
 #   token = var.databricks_token
 # }
 
-#OAuth M2M authentication
+#Authenticating with Azure-managed Service Principal
+provider "azurerm" {
+  features {}
+  skip_provider_registration = true
+  client_id       = var.azureSP_client_id
+  client_secret   = var.azureSPclient_secret
+  tenant_id       = var.azure_tenant_id
+  subscription_id = var.subscription_id
+}
+
 provider "databricks" {
   alias = "workspace"
-  host = var.databricks_host
-  client_id = var.databricks_client_ID
-  client_secret = var.databricks_client_secret
+  host                        = var.databricks_host
+  azure_client_id             = var.azureSP_client_id
+  azure_client_secret         = var.azureSPclient_secret
+  azure_tenant_id             = var.azure_tenant_id
 }

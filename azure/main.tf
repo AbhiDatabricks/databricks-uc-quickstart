@@ -47,7 +47,6 @@ resource "databricks_storage_credential" "external_mi" {
     access_connector_id = azurerm_databricks_access_connector.db_mi.id
   }
   comment = "Managed identity credential managed by TF"
-  depends_on = [ azurerm_role_assignment.mi_data_contributor ]
 }
 
 // Create Databricks External Location
@@ -58,7 +57,7 @@ resource "databricks_external_location" "db_ext_loc" {
   azurerm_storage_account.db_uc_catalog.name)
   credential_name = databricks_storage_credential.external_mi.id
   comment         = "Managed by TF"
-  depends_on = [databricks_storage_credential.external_mi]
+  depends_on = [ azurerm_role_assignment.mi_data_contributor ]
 }
 
 // Create Databricks Catalog
