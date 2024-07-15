@@ -43,9 +43,17 @@ variable "databricks_token" {
 }
 
 #Authenticating with Azure-managed Service Principal
-variable "databricks_client_id"{
+variable "databricks_resource_id"{
+  default = "databricks_resource_id"
+}
+variable "azure_client_id"{
   default = "sp_client_id"
 }
-variable "databricks_client_secret"{
+variable "azure_client_secret"{
   default = "sp_client_secret"
 }
+variable "azure_tenant_id"{
+  default = "azure_tenant_id"
+}
+
+

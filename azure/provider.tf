@@ -24,9 +24,9 @@ provider "azurerm" {
 
 #Authenticating with Azure-managed Service Principal
 provider "databricks" {
-  alias = "workspace"
-  auth_type = "oauth-m2m"
   host                        = var.databricks_host
-  client_id             = var.databricks_client_id
-  client_secret         = var.databricks_client_secret
+  azure_workspace_resource_id = var.databricks_resource_id
+  azure_client_id             = var.azure_client_id
+  azure_client_secret         = var.azure_client_secret
+  azure_tenant_id             = var.azure_tenant_id
 }
