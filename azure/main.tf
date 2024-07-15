@@ -47,6 +47,7 @@ resource "databricks_storage_credential" "external_mi" {
     access_connector_id = azurerm_databricks_access_connector.db_mi.id
   }
   comment = "Managed identity credential managed by TF"
+  depends_on = [ azurerm_role_assignment.mi_data_contributor ]
 }
 
 // Create Databricks External Location
@@ -63,11 +64,7 @@ resource "databricks_external_location" "db_ext_loc" {
 // Create Databricks Catalog
 resource "databricks_catalog" "sandbox" {
   name         = var.catalog_name
-  storage_root = format(
-    "abfss://%s@%s.dfs.core.windows.net",
-    azurerm_storage_container.db_uc_catalog.name,
-  azurerm_storage_account.db_uc_catalog.name
-  )
+  storage_root = databricks_external_location.db_ext_loc.url
   # TODO: obviously this may not be ideal
   force_destroy = true
 }
