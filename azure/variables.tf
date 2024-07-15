@@ -18,7 +18,15 @@ variable "subscription_id" {
 }
 
 variable "databricks_host" {}
-variable "databricks_token" {}
+variable "databricks_token" {
+  default     = "userPatToken"
+}
+variable "databricks_client_ID" {
+  default     = "sp_client_ID"
+}
+variable "databricks_client_secret" {
+  default     = "sp_client_secret"
+}
 
 # variable "databricks_account_id" {
 #   description = "The Databricks Account ID"
