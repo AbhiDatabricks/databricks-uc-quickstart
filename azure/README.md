@@ -4,3 +4,6 @@
 - Microsoft.Databricks
 - Microsoft.Storage
 - Microsoft.ManagedIdentity
+
+2. **Service Principal Permissions**
+- Contributor - Azure Subscription
