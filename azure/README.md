@@ -7,3 +7,4 @@
 
 2. **Service Principal Permissions**
 - Owner - Azure Subscription
+- Account Admin - Databricks Account Portal
