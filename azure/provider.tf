@@ -1,8 +1,8 @@
-# provider "azurerm" {
-#   skip_provider_registration = true
-#   features {}
-#   # subscription_id = var.subscription_id
-# }
+provider "azurerm" {
+  skip_provider_registration = true
+  features {}
+  # subscription_id = var.subscription_id
+}
 
 # provider "azapi" {
 #   subscription_id = var.subscription_id
@@ -25,6 +25,7 @@
 #Authenticating with Azure-managed Service Principal
 provider "databricks" {
   alias = "workspace"
+  auth_type = "oauth-m2m"
   host                        = var.databricks_host
   client_id             = var.databricks_client_id
   client_secret         = var.databricks_client_secret
