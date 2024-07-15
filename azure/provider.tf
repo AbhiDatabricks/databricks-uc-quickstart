@@ -26,10 +26,6 @@
 provider "azurerm" {
   features {}
   skip_provider_registration = true
-  client_id       = var.azureSP_client_id
-  client_secret   = var.azureSPclient_secret
-  tenant_id       = var.azure_tenant_id
-  subscription_id = var.subscription_id
 }
 
 provider "databricks" {
