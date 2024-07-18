@@ -15,7 +15,6 @@ resource "azurerm_databricks_access_connector" "db_mi" {
   }
 }
 
-
 // Create a storage account to be used by unity catalog metastore as root storage
 resource "azurerm_storage_account" "db_uc_catalog" {
   name                     = "${local.dlsprefix}acc"
@@ -58,16 +57,13 @@ resource "databricks_external_location" "db_ext_loc" {
   azurerm_storage_account.db_uc_catalog.name)
   credential_name = databricks_storage_credential.external_mi.id
   comment         = "Managed by TF"
+  depends_on = [ azurerm_role_assignment.mi_data_contributor ]
 }
 
 // Create Databricks Catalog
 resource "databricks_catalog" "sandbox" {
   name         = var.catalog_name
-  storage_root = format(
-    "abfss://%s@%s.dfs.core.windows.net",
-    azurerm_storage_container.db_uc_catalog.name,
-  azurerm_storage_account.db_uc_catalog.name
-  )
+  storage_root = databricks_external_location.db_ext_loc.url
   # TODO: obviously this may not be ideal
   force_destroy = true
 }

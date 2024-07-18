@@ -17,8 +17,6 @@ variable "subscription_id" {
   type        = string
 }
 
-variable "databricks_host" {}
-variable "databricks_token" {}
 
 # variable "databricks_account_id" {
 #   description = "The Databricks Account ID"
@@ -35,3 +33,27 @@ variable "catalog_name" {
   type        = string
   default     = "sandbox"
 }
+
+#Authentication variables
+variable "databricks_host" {}
+
+#Token Based Authentication variables
+variable "databricks_token" {
+  default     = "tokenAuthentication"
+}
+
+#Authenticating with Azure-managed Service Principal
+variable "databricks_resource_id"{
+  default = "databricks_resource_id"
+}
+variable "azure_client_id"{
+  default = "sp_client_id"
+}
+variable "azure_client_secret"{
+  default = "sp_client_secret"
+}
+variable "azure_tenant_id"{
+  default = "azure_tenant_id"
+}
+
+
