@@ -1,6 +1,6 @@
 locals {
-  prefix = "uc-quickstart-${random_string.naming.result}"
-  dlsprefix = "ucquickstart${random_string.naming.result}"
+  prefix = "ucqs-${random_string.naming.result}"
+  dlsprefix = "ucqs${random_string.naming.result}"
   tags = {
     project = "uc-quickstart"
   }
@@ -17,11 +17,10 @@ variable "subscription_id" {
   type        = string
 }
 
-
-# variable "databricks_account_id" {
-#   description = "The Databricks Account ID"
-#   type        = string
-# }
+variable "resource_group" {
+  description = "The Azure resource group name"
+  type        = string
+}
 
 variable "location" {
   description = "The Azure location"
@@ -29,18 +28,8 @@ variable "location" {
   default     = "Australia East"
 }
 
-variable "catalog_name" {
-  type        = string
-  default     = "sandbox"
-}
-
-#Authentication variables
 variable "databricks_host" {}
-
-#Token Based Authentication variables
-variable "databricks_token" {
-  default     = "tokenAuthentication"
-}
+variable "databricks_token" {}
 
 #Authenticating with Azure-managed Service Principal
 variable "databricks_resource_id"{
@@ -56,4 +45,19 @@ variable "azure_tenant_id"{
   default = "azure_tenant_id"
 }
 
+#############
+# Configure catalog names to deploy
+variable "catalog_1" {
+  type        = string
+  default     = "sandbox"
+}
 
+variable "catalog_2" {
+  type        = string
+  default     = "dev"
+}
+
+variable "catalog_3" {
+  type        = string
+  default     = "prod"
+}
