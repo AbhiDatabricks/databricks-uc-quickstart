@@ -12,11 +12,6 @@ resource "random_string" "naming" {
   length  = 6
 }
 
-variable "subscription_id" {
-  description = "The Azure subscription ID"
-  type        = string
-}
-
 variable "resource_group" {
   description = "The Azure resource group name"
   type        = string
