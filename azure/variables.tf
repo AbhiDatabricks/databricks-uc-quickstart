@@ -22,15 +22,28 @@ variable "resource_group" {
   type        = string
 }
 
-variable "databricks_host" {}
-variable "databricks_token" {}
-
 variable "location" {
   description = "The Azure location"
   type        = string
   default     = "Australia East"
 }
 
+variable "databricks_host" {}
+variable "databricks_token" {}
+
+#Authenticating with Azure-managed Service Principal
+variable "databricks_resource_id"{
+  default = "databricks_resource_id"
+}
+variable "azure_client_id"{
+  default = "sp_client_id"
+}
+variable "azure_client_secret"{
+  default = "sp_client_secret"
+}
+variable "azure_tenant_id"{
+  default = "azure_tenant_id"
+}
 
 #############
 # Configure catalog names to deploy
