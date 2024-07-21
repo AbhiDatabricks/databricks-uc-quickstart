@@ -19,7 +19,7 @@ Here’s how to deploy your Unity Catalog environment using Terraform:
 ### Prerequisites
 
 - Databricks account
-- Terraform installed on your machine
+- Install [Terraform](https://developer.hashicorp.com/terraform/downloads)
 - Basic understanding of Databricks and Terraform
 
 ### Installation
