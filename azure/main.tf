@@ -1,69 +1,65 @@
-// Create azure resource group
-resource "azurerm_resource_group" "this" {
-  name     = "${local.prefix}-rg"
-  location = var.location
-  tags     = local.tags
-}
+module "sandbox_catalog" {
+  source = "./modules/env"
 
-// Create azure managed identity to be used by Databricks storage credential
-resource "azurerm_databricks_access_connector" "db_mi" {
-  name                = "${local.prefix}-databricks-mi"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-  identity {
-    type = "SystemAssigned"
+  providers = {
+    azurerm = azurerm
+    databricks = databricks
   }
+
+  access_connector_id     = ""
+  access_connector_name   = "${local.prefix}-${var.catalog_1}-databricks-mi"
+  resource_group          = var.resource_group
+  location                = var.location
+  storage_account_name    = "${local.dlsprefix}${var.catalog_1}acc"
+  tags                    = local.tags
+  storage_container_name  = "${local.prefix}-${var.catalog_1}"
+
+  storage_credential_name = "${local.prefix}-${var.catalog_1}"
+  external_location_name  = "${local.prefix}-${var.catalog_1}"
+  
+  catalog_name            = "${local.prefix}-${var.catalog_1}"
 }
 
-// Create a storage account to be used by unity catalog metastore as root storage
-resource "azurerm_storage_account" "db_uc_catalog" {
-  name                     = "${local.dlsprefix}acc"
-  resource_group_name      = azurerm_resource_group.this.name
-  location                 = azurerm_resource_group.this.location
-  tags                     = azurerm_resource_group.this.tags
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  is_hns_enabled           = true
-}
+module "dev_catalog" {
+  source = "./modules/env"
 
-// Create a container in storage account to be used by unity catalog metastore as root storage
-resource "azurerm_storage_container" "db_uc_catalog" {
-  name                  = "${local.prefix}-catalog"
-  storage_account_name  = azurerm_storage_account.db_uc_catalog.name
-  container_access_type = "private"
-}
-
-// Assign the Storage Blob Data Contributor role to managed identity to allow unity catalog to access the storage
-resource "azurerm_role_assignment" "mi_data_contributor" {
-  scope                = azurerm_storage_account.db_uc_catalog.id
-  role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = azurerm_databricks_access_connector.db_mi.identity[0].principal_id
-}
-
-// Create Databricks Storage Credential
-resource "databricks_storage_credential" "external_mi" {
-  name = "mi_credential"
-  azure_managed_identity {
-    access_connector_id = azurerm_databricks_access_connector.db_mi.id
+  providers = {
+    azurerm = azurerm
+    databricks = databricks
   }
-  comment = "Managed identity credential managed by TF"
+
+  access_connector_id     = ""
+  access_connector_name   = "${local.prefix}-${var.catalog_2}-databricks-mi"
+  resource_group          = var.resource_group
+  location                = var.location
+  storage_account_name    = "${local.dlsprefix}${var.catalog_2}acc"
+  tags                    = local.tags
+  storage_container_name  = "${local.prefix}-${var.catalog_2}"
+
+  storage_credential_name = "${local.prefix}-${var.catalog_2}"
+  external_location_name  = "${local.prefix}-${var.catalog_2}"
+  
+  catalog_name            = "${local.prefix}-${var.catalog_2}"
 }
 
-// Create Databricks External Location
-resource "databricks_external_location" "db_ext_loc" {
-  name = "${local.prefix}-ext-loc"
-  url = format("abfss://%s@%s.dfs.core.windows.net",
-    azurerm_storage_container.db_uc_catalog.name,
-  azurerm_storage_account.db_uc_catalog.name)
-  credential_name = databricks_storage_credential.external_mi.id
-  comment         = "Managed by TF"
-  depends_on = [ azurerm_role_assignment.mi_data_contributor ]
-}
+module "prod_catalog" {
+  source = "./modules/env"
 
-// Create Databricks Catalog
-resource "databricks_catalog" "sandbox" {
-  name         = var.catalog_name
-  storage_root = databricks_external_location.db_ext_loc.url
-  # TODO: obviously this may not be ideal
-  force_destroy = true
+  providers = {
+    azurerm = azurerm
+    databricks = databricks
+  }
+
+  access_connector_id     = ""
+  access_connector_name   = "${local.prefix}-${var.catalog_3}-databricks-mi"
+  resource_group          = var.resource_group
+  location                = var.location
+  storage_account_name    = "${local.dlsprefix}${var.catalog_3}acc"
+  tags                    = local.tags
+  storage_container_name  = "${local.prefix}-${var.catalog_3}"
+
+  storage_credential_name = "${local.prefix}-${var.catalog_3}"
+  external_location_name  = "${local.prefix}-${var.catalog_3}"
+  
+  catalog_name            = "${local.prefix}-${var.catalog_3}"
 }
