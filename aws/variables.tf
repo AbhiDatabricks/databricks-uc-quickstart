@@ -17,6 +17,8 @@ variable "tags" {
 variable "databricks_account_id" {}
 variable "databricks_host" {}
 variable "databricks_token" {}
+# Include the aws_session_token if the temporary credential is used
+# variable "aws_session_token" {}
 variable "databricks_client_id" {}
 variable "databricks_client_secret" {}
 variable "databricks_workspace_id" {}

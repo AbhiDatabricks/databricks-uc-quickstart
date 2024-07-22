@@ -39,8 +39,8 @@ markdown
 Copy code
 
 3. **Configuration:**
-- Navigate to the `terraform` directory.
-- Modify the `main.tf` file to update parameters as needed.
+- Navigate to either the `aws` or `azure` directory, depending on the cloud provider you are using.
+- Follow the instructions in the README file located in that directory.
 
 4. **Apply Configuration:**
 - Apply the Terraform configuration to deploy the Unity Catalog.
