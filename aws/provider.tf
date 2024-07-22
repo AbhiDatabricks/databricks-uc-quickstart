@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     databricks = {
-      source  = "databricks/databricks"
+      source = "databricks/databricks"
     }
     aws = {
       source  = "hashicorp/aws"
@@ -22,7 +22,7 @@ provider "aws" {
 
 // initialize provider at account level for provisioning workspace with AWS PrivateLink
 provider "databricks" {
-    # profile = "db-aws"
-    host = var.databricks_host
-    token = var.databricks_token
+  # profile = "db-aws"
+  host  = var.databricks_host
+  token = var.databricks_token
 }

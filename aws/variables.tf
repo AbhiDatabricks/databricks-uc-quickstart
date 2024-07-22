@@ -31,55 +31,55 @@ variable "aws_access_key" {}
 variable "aws_secret_key" {}
 variable "aws_account_id" {}
 
-variable catalog_1 {
+variable "catalog_1" {
   default = "prod"
 }
 
-variable catalog_2 {
+variable "catalog_2" {
   default = "dev"
 }
 
-variable catalog_3 {
+variable "catalog_3" {
   default = "sandbox"
 }
 
-variable group_1 {
+variable "group_1" {
   default = "production_sp"
 }
 
-variable group_2 {
+variable "group_2" {
   default = "developers"
 }
 
-variable group_3 {
+variable "group_3" {
   default = "sandbox_users"
 }
 
 
 
-variable "catalog_1_permissions"{
+variable "catalog_1_permissions" {
   type = map(list(string))
   default = {
     group_1 = ["ALL_PRIVILEGES"]
-    group_2 = ["USE_CATALOG",  "SELECT"]
+    group_2 = ["USE_CATALOG", "SELECT"]
     group_3 = []
-    }
   }
+}
 
-variable "catalog_2_permissions"{
+variable "catalog_2_permissions" {
   type = map(list(string))
   default = {
     group_1 = ["ALL_PRIVILEGES"]
     group_2 = ["ALL_PRIVILEGES"]
     group_3 = []
-    }
   }
+}
 
-variable "catalog_3_permissions"{
+variable "catalog_3_permissions" {
   type = map(list(string))
   default = {
     group_1 = ["ALL_PRIVILEGES"]
     group_2 = ["ALL_PRIVILEGES"]
     group_3 = ["ALL_PRIVILEGES"]
-    }
   }
+}
