@@ -41,6 +41,18 @@ module "sandbox_users_group" {
 }
 
 
+module "test" {
+  source                = "./users"
+  group_name            = "${local.prefix}-${var.group_3}"
+  databricks_account_id = var.databricks_account_id
+  databricks_host       = var.databricks_host
+  # databricks_account_username = var.databricks_account_username
+  # databricks_account_password = var.databricks_account_password
+  client_id               = var.databricks_client_id
+  client_secret           = var.databricks_client_secret
+  databricks_workspace_id = var.databricks_workspace_id
+}
+
 
 
 // create the catalogs and infrastructure
@@ -145,4 +157,14 @@ module "grant_sandbox" {
   group_2_name = "${local.prefix}-${var.group_2}"
   group_3_name = "${local.prefix}-${var.group_3}"
   depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.sandbox_env]
+}
+
+
+module "public_preview_system_table" {
+  source = "./system_schema"
+}
+
+
+module "cluster_configuration" {
+  source = "./cluster_configuration"
 }
