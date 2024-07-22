@@ -43,6 +43,13 @@ module "catalog" {
   storage_root     = "s3://${module.infra.bucket_id}/data" # databricks_external_location.uc_external_location.url + storage_path
 }
 
+module "public_preview_system_table" {
+  source = "./modules/system_schema/"
+  providers = {
+    databricks = databricks
+  }
+}
+
 # module "grant" {
 #   source = "./modules/grant"
 #   providers = {
