@@ -10,6 +10,7 @@
 - Account Admin - Databricks Account Portal
 
 3. **Existing Resources**
+- Azure Databricks workspace
 - Resource Group for Access Connectors & Storage Accounts
 
 # Deploy multiple catalogs in Databricks UC
