@@ -16,7 +16,7 @@
 
 ## 1. **Configure TFVAR file**
 
-Create a tfvar file and name it `db.tffvar`
+Create a tfvar file and name it `db.tfvar`
 
 Copy below configurations and replace with relevant entries
 
