@@ -19,7 +19,8 @@ resource "databricks_external_location" "db_ext_loc" {
   credential_name = databricks_storage_credential.db_uc_storage_cred.id
   comment         = "Managed by TF"
   depends_on = [
-    databricks_storage_credential.db_uc_storage_cred
+    databricks_storage_credential.db_uc_storage_cred,
+    azurerm_role_assignment.db_mi_data_contributor
   ]
   force_destroy = true
 }
