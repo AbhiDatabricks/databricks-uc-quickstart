@@ -9,6 +9,9 @@
 - Owner - Azure Subscription
 - Account Admin - Databricks Account Portal
 
+3. **Existing Resources**
+- Resource Group for Access Connectors & Storage Accounts
+
 # Deploy multiple catalogs in Databricks UC
 
 ## 1. **Configure TFVAR file**
