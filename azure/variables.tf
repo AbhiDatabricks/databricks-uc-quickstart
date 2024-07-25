@@ -23,6 +23,8 @@ variable "location" {
   default     = "Australia East"
 }
 
+variable "databricks_account_id" {}
+variable "databricks_workspace_id" {}
 variable "databricks_host" {}
 variable "databricks_token" {}
 
@@ -56,3 +58,18 @@ variable "catalog_3" {
   type        = string
   default     = "prod"
 }
+
+#############
+# Configure Account Group names to deploy
+variable "group_1" {
+  default = "production_sp"
+}
+
+variable "group_2" {
+  default = "developers"
+}
+
+variable "group_3" {
+  default = "sandbox_users"
+}
+

@@ -1,3 +1,4 @@
+// This creates a sandbox catalog with a seperate storage account, access_connector, storage credential and external location
 module "sandbox_catalog" {
   source = "./modules/env"
 
@@ -20,6 +21,7 @@ module "sandbox_catalog" {
   catalog_name            = "${local.prefix}-${var.catalog_1}"
 }
 
+// This creates a dev catalog with a seperate storage account, access_connector, storage credential and external location
 module "dev_catalog" {
   source = "./modules/env"
 
@@ -42,6 +44,7 @@ module "dev_catalog" {
   catalog_name            = "${local.prefix}-${var.catalog_2}"
 }
 
+// This creates a prod catalog with a seperate storage account, access_connector, storage credential and external location
 module "prod_catalog" {
   source = "./modules/env"
 
@@ -62,4 +65,38 @@ module "prod_catalog" {
   external_location_name  = "${local.prefix}-${var.catalog_3}"
   
   catalog_name            = "${local.prefix}-${var.catalog_3}"
+}
+
+// 
+module "prod_sp_group" {
+  source                = "./modules/users"
+  group_name            = "${local.prefix}-${var.group_1}"
+  databricks_account_id = var.databricks_account_id
+  # databricks_account_username = var.databricks_account_username
+  # databricks_account_password = var.databricks_account_password
+  azure_client_id               = var.azure_client_id
+  azure_client_secret           = var.azure_client_secret
+  databricks_workspace_id = var.databricks_workspace_id
+}
+
+module "developers_group" {
+  source                = "./modules/users"
+  group_name            = "${local.prefix}-${var.group_2}"
+  databricks_account_id = var.databricks_account_id
+  # databricks_account_username = var.databricks_account_username
+  # databricks_account_password = var.databricks_account_password
+  azure_client_id               = var.azure_client_id
+  azure_client_secret           = var.azure_client_secret
+  databricks_workspace_id = var.databricks_workspace_id
+}
+
+module "sandbox_users_group" {
+  source                = "./modules/users"
+  group_name            = "${local.prefix}-${var.group_3}"
+  databricks_account_id = var.databricks_account_id
+  # databricks_account_username = var.databricks_account_username
+  # databricks_account_password = var.databricks_account_password
+  azure_client_id               = var.azure_client_id
+  azure_client_secret           = var.azure_client_secret
+  databricks_workspace_id = var.databricks_workspace_id
 }
