@@ -1,7 +1,7 @@
-terraform {
-  required_providers {
-    databricks = {
-      source  = "databricks/databricks"
-    }
-  }
-}
+# terraform {
+#   required_providers {
+#     databricks = {
+#       source  = "databricks/databricks"
+#     }
+#   }
+# }
