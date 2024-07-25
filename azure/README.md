@@ -9,11 +9,15 @@
 - Owner - Azure Subscription
 - Account Admin - Databricks Account Portal
 
+3. **Existing Resources**
+- Azure Databricks workspace
+- Resource Group for Access Connectors & Storage Accounts
+
 # Deploy multiple catalogs in Databricks UC
 
 ## 1. **Configure TFVAR file**
 
-Create a tfvar file and name it `db.tffvar`
+Create a tfvar file and name it `db.tfvar`
 
 Copy below configurations and replace with relevant entries
 
