@@ -70,6 +70,11 @@ module "prod_catalog" {
 // 
 module "prod_sp_group" {
   source                        = "./modules/users"
+
+  providers = {
+    databricks = databricks.account
+  }
+
   group_name                    = "${local.prefix}-${var.group_1}"
   databricks_account_id         = var.databricks_account_id
   # databricks_account_username = var.databricks_account_username
@@ -82,6 +87,11 @@ module "prod_sp_group" {
 
 module "developers_group" {
   source                        = "./modules/users"
+
+  providers = {
+    databricks = databricks.account
+  }
+  
   group_name                    = "${local.prefix}-${var.group_2}"
   databricks_account_id         = var.databricks_account_id
   # databricks_account_username = var.databricks_account_username
@@ -94,6 +104,11 @@ module "developers_group" {
 
 module "sandbox_users_group" {
   source                        = "./modules/users"
+
+  providers = {
+    databricks = databricks.account
+  }
+  
   group_name                    = "${local.prefix}-${var.group_3}"
   databricks_account_id         = var.databricks_account_id
   # databricks_account_username = var.databricks_account_username
