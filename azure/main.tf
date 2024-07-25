@@ -4,7 +4,7 @@ module "sandbox_catalog" {
 
   providers = {
     azurerm = azurerm
-    databricks = databricks
+    databricks = databricks.workspace
   }
 
   access_connector_id     = ""
@@ -27,7 +27,7 @@ module "dev_catalog" {
 
   providers = {
     azurerm = azurerm
-    databricks = databricks
+    databricks = databricks.workspace
   }
 
   access_connector_id     = ""
@@ -50,7 +50,7 @@ module "prod_catalog" {
 
   providers = {
     azurerm = azurerm
-    databricks = databricks
+    databricks = databricks.workspace
   }
 
   access_connector_id     = ""
