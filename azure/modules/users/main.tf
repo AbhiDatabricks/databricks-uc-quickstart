@@ -1,5 +1,4 @@
 resource "databricks_group" "account_group" {
-  provider     = databricks.account
   display_name = var.group_name
   workspace_access = true
 }
