@@ -12,6 +12,7 @@ provider "azurerm" {
 
 #Authenticating with Azure-managed Service Principal
 provider "databricks" {
+  alias                       = "workspace"
   host                        = var.databricks_host
   azure_workspace_resource_id = var.databricks_resource_id
   azure_client_id             = var.azure_client_id
