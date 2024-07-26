@@ -1,3 +1,7 @@
+# Databricks Environment Variables
+databricks_account_id    = "" // Your Azure Databricks Account ID
+databricks_workspace_id  = "" // The Azure Databricks workspace ID e.g. "adb-{workspace_id}.x.azuredatabricks.net"
+
 # Common Authentication Variables
 databricks_host          = "" // The URL of the workspace e.g "adb-xxxxxxxxxxxxxxx.x.azuredatabricks.net"
 
