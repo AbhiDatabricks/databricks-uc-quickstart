@@ -118,3 +118,11 @@ module "sandbox_users_group" {
   databricks_workspace_id       = var.databricks_workspace_id
   azure_tenant_id               = var.azure_tenant_id
 }
+
+module "system_schema" {
+  source                        = "./modules/system_schema"
+
+  providers = {
+    databricks = databricks.workspace
+  }
+}
