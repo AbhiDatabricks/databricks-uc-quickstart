@@ -162,6 +162,9 @@ module "grant_sandbox" {
 
 module "public_preview_system_table" {
   source = "./system_schema"
+  databricks_host       = var.databricks_host
+  client_id               = var.databricks_client_id
+  client_secret           = var.databricks_client_secret
 }
 
 
