@@ -1,5 +1,5 @@
 locals {
-  prefix = "ucqs-${random_string.naming.result}"
+  prefix    = "ucqs-${random_string.naming.result}"
   dlsprefix = "ucqs${random_string.naming.result}"
   tags = {
     project = "uc-quickstart"
@@ -29,34 +29,34 @@ variable "databricks_host" {}
 variable "databricks_token" {}
 
 #Authenticating with Azure-managed Service Principal
-variable "databricks_resource_id"{
+variable "databricks_resource_id" {
   default = "databricks_resource_id"
 }
-variable "azure_client_id"{
+variable "azure_client_id" {
   default = "sp_client_id"
 }
-variable "azure_client_secret"{
+variable "azure_client_secret" {
   default = "sp_client_secret"
 }
-variable "azure_tenant_id"{
+variable "azure_tenant_id" {
   default = "azure_tenant_id"
 }
 
 #############
 # Configure catalog names to deploy
 variable "catalog_1" {
-  type        = string
-  default     = "sandbox"
+  type    = string
+  default = "sandbox"
 }
 
 variable "catalog_2" {
-  type        = string
-  default     = "dev"
+  type    = string
+  default = "dev"
 }
 
 variable "catalog_3" {
-  type        = string
-  default     = "prod"
+  type    = string
+  default = "prod"
 }
 
 #############
