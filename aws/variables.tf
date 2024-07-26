@@ -17,8 +17,7 @@ variable "tags" {
 variable "databricks_account_id" {}
 variable "databricks_host" {}
 variable "databricks_token" {}
-# Include the aws_session_token if the temporary credential is used
-# variable "aws_session_token" {}
+
 variable "databricks_client_id" {}
 variable "databricks_client_secret" {}
 variable "databricks_workspace_id" {}
@@ -27,8 +26,23 @@ variable "region" {
   default = "ap-southeast-2"
 }
 
-variable "aws_access_key" {}
-variable "aws_secret_key" {}
+# Include the aws_session_token if the temporary credential is used
+variable "aws_session_token" {
+  description = "AWS session token"
+  type        = string
+  default     = null
+}
+
+variable "aws_access_key" {
+  description = "AWS Access Key"
+  type        = string
+  default     = null
+}
+variable "aws_secret_key" {
+  description = "AWS secret Key"
+  type        = string
+  default     = null
+}
 variable "aws_account_id" {}
 
 variable "catalog_1" {

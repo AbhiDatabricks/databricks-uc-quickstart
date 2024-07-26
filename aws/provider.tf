@@ -17,7 +17,7 @@ provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
   # Include the aws_session_token if the temporary credential is used
-  # token = var.aws_session_token
+  token = var.aws_session_token
 }
 
 // initialize provider at account level for provisioning workspace with AWS PrivateLink
