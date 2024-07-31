@@ -3,7 +3,6 @@ resource "time_sleep" "wait" {
 }
 
 resource "databricks_grants" "this" {
-#   for_each = var.permissions
   catalog = var.catalog_name
   grant {
     principal  = var.group_1_name

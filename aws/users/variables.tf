@@ -1,4 +1,3 @@
-variable "databricks_host" {}
 variable "databricks_account_id" {}
 variable "client_id" {}
 variable "client_secret" {}
