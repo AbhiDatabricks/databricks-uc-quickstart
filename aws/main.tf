@@ -1,16 +1,11 @@
 
 
-//create the groups and assign to the workspace
-
-
+//Create the different groups and asssign them to the workspaces
 
 module "prod_sp_group" {
   source                = "./users"
   group_name            = "${local.prefix}-${var.group_1}"
   databricks_account_id = var.databricks_account_id
-  databricks_host       = var.databricks_host
-  # databricks_account_username = var.databricks_account_username
-  # databricks_account_password = var.databricks_account_password
   client_id               = var.databricks_client_id
   client_secret           = var.databricks_client_secret
   databricks_workspace_id = var.databricks_workspace_id
@@ -20,9 +15,6 @@ module "developers_group" {
   source                = "./users"
   group_name            = "${local.prefix}-${var.group_2}"
   databricks_account_id = var.databricks_account_id
-  databricks_host       = var.databricks_host
-  # databricks_account_username = var.databricks_account_username
-  # databricks_account_password = var.databricks_account_password
   client_id               = var.databricks_client_id
   client_secret           = var.databricks_client_secret
   databricks_workspace_id = var.databricks_workspace_id
@@ -32,30 +24,15 @@ module "sandbox_users_group" {
   source                = "./users"
   group_name            = "${local.prefix}-${var.group_3}"
   databricks_account_id = var.databricks_account_id
-  databricks_host       = var.databricks_host
-  # databricks_account_username = var.databricks_account_username
-  # databricks_account_password = var.databricks_account_password
   client_id               = var.databricks_client_id
   client_secret           = var.databricks_client_secret
   databricks_workspace_id = var.databricks_workspace_id
 }
 
 
-module "test" {
-  source                = "./users"
-  group_name            = "${local.prefix}-${var.group_3}"
-  databricks_account_id = var.databricks_account_id
-  databricks_host       = var.databricks_host
-  # databricks_account_username = var.databricks_account_username
-  # databricks_account_password = var.databricks_account_password
-  client_id               = var.databricks_client_id
-  client_secret           = var.databricks_client_secret
-  databricks_workspace_id = var.databricks_workspace_id
-}
+// Create the Catalogs and associated cloud infrastructure
 
-
-
-// create the catalogs and infrastructure
+// This creates a dev catalog with separate S3 Bucket and dedicated storage location
 module "dev_env" {
   source = "./env"
 
@@ -79,6 +56,7 @@ module "dev_env" {
   iam_role_arn            = ""
 }
 
+// This creates a prod catalog with separate S3 Bucket and dedicated storage location
 module "prod_env" {
   source = "./env"
 
@@ -102,6 +80,7 @@ module "prod_env" {
   iam_role_arn            = ""
 }
 
+// This creates a sandbox catalog with separate S3 Bucket and dedicated storage location
 module "sandbox_env" {
   source = "./env"
 
