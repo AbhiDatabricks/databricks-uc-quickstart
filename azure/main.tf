@@ -119,6 +119,47 @@ module "sandbox_users_group" {
   azure_tenant_id         = var.azure_tenant_id
 }
 
+// Grant privileges
+
+module "grant_prod" {
+  source       = "./modules/grant"
+  providers = {
+    databricks = databricks.workspace
+  }
+  catalog_name = "${local.prefix}-${var.catalog_3}"
+  permissions  = var.catalog_1_permissions
+  group_1_name = "${local.prefix}-${var.group_1}"
+  group_2_name = "${local.prefix}-${var.group_2}"
+  group_3_name = "${local.prefix}-${var.group_3}"
+  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.prod_catalog]
+}
+
+module "grant_dev" {
+  source       = "./modules/grant"
+  providers = {
+    databricks = databricks.workspace
+  }
+  catalog_name = "${local.prefix}-${var.catalog_2}"
+  permissions  = var.catalog_2_permissions
+  group_1_name = "${local.prefix}-${var.group_1}"
+  group_2_name = "${local.prefix}-${var.group_2}"
+  group_3_name = "${local.prefix}-${var.group_3}"
+  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.dev_catalog]
+}
+
+module "grant_sandbox" {
+  source       = "./modules/grant"
+  providers = {
+    databricks = databricks.workspace
+  }
+  catalog_name = "${local.prefix}-${var.catalog_1}"
+  permissions  = var.catalog_3_permissions
+  group_1_name = "${local.prefix}-${var.group_1}"
+  group_2_name = "${local.prefix}-${var.group_2}"
+  group_3_name = "${local.prefix}-${var.group_3}"
+  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.sandbox_catalog]
+}
+
 module "system_schema" {
   source = "./modules/system_schema"
   providers = {
