@@ -128,7 +128,7 @@ module "grant_prod" {
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
   group_3_name = "${local.prefix}-${var.group_3}"
-  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.prod_env]
+  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.prod_catalog]
 }
 
 module "grant_dev" {
@@ -138,7 +138,7 @@ module "grant_dev" {
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
   group_3_name = "${local.prefix}-${var.group_3}"
-  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.dev_env]
+  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.dev_catalog]
 }
 
 module "grant_sandbox" {
@@ -148,7 +148,7 @@ module "grant_sandbox" {
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
   group_3_name = "${local.prefix}-${var.group_3}"
-  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.sandbox_env]
+  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.sandbox_catalog]
 }
 
 module "system_schema" {
