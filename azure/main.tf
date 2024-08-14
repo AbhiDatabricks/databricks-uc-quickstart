@@ -123,6 +123,9 @@ module "sandbox_users_group" {
 
 module "grant_prod" {
   source       = "./modules/grant"
+  providers = {
+    databricks = databricks.workspace
+  }
   catalog_name = "${local.prefix}-${var.catalog_1}"
   permissions  = var.catalog_1_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
@@ -133,6 +136,9 @@ module "grant_prod" {
 
 module "grant_dev" {
   source       = "./modules/grant"
+  providers = {
+    databricks = databricks.workspace
+  }
   catalog_name = "${local.prefix}-${var.catalog_2}"
   permissions  = var.catalog_2_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
@@ -143,6 +149,9 @@ module "grant_dev" {
 
 module "grant_sandbox" {
   source       = "./modules/grant"
+  providers = {
+    databricks = databricks.workspace
+  }
   catalog_name = "${local.prefix}-${var.catalog_3}"
   permissions  = var.catalog_3_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
