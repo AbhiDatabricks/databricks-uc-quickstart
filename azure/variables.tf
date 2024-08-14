@@ -73,3 +73,31 @@ variable "group_3" {
   default = "sandbox_users"
 }
 
+#############
+# Configure catalog permissions for different groups
+variable "catalog_1_permissions" {
+  type = map(list(string))
+  default = {
+    group_1 = ["ALL_PRIVILEGES"]
+    group_2 = ["USE_CATALOG", "SELECT"]
+    group_3 = []
+  }
+}
+
+variable "catalog_2_permissions" {
+  type = map(list(string))
+  default = {
+    group_1 = ["ALL_PRIVILEGES"]
+    group_2 = ["ALL_PRIVILEGES"]
+    group_3 = []
+  }
+}
+
+variable "catalog_3_permissions" {
+  type = map(list(string))
+  default = {
+    group_1 = ["ALL_PRIVILEGES"]
+    group_2 = ["ALL_PRIVILEGES"]
+    group_3 = ["ALL_PRIVILEGES"]
+  }
+}
