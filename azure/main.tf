@@ -126,7 +126,7 @@ module "grant_prod" {
   providers = {
     databricks = databricks.workspace
   }
-  catalog_name = "${local.prefix}-${var.catalog_1}"
+  catalog_name = "${local.prefix}-${var.catalog_3}"
   permissions  = var.catalog_1_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
@@ -152,7 +152,7 @@ module "grant_sandbox" {
   providers = {
     databricks = databricks.workspace
   }
-  catalog_name = "${local.prefix}-${var.catalog_3}"
+  catalog_name = "${local.prefix}-${var.catalog_1}"
   permissions  = var.catalog_3_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
