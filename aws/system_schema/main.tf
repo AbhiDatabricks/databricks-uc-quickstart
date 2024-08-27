@@ -15,10 +15,10 @@ resource "databricks_system_schema" "compute" {
   schema = "compute"
 }
 
-resource "databricks_system_schema" "workflow" {
-  provider     = databricks
-  schema = "workflow"
-}
+# resource "databricks_system_schema" "workflow" {
+#   provider     = databricks
+#   schema = "workflow"
+# }
 
 resource "databricks_system_schema" "marketplace" {
   provider     = databricks
