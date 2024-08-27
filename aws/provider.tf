@@ -22,9 +22,18 @@ provider "aws" {
 
 // initialize provider at account level for provisioning workspace with AWS PrivateLink
 provider "databricks" {
+  alias         = "workspace"
   # profile = "db-aws"
   host  = var.databricks_host
   # token = var.databricks_token
   client_id     = var.databricks_client_id
   client_secret = var.databricks_client_secret
+}
+
+provider "databricks" {
+  alias         = "account"
+  host          = "https://accounts.cloud.databricks.com"
+  client_id     = var.databricks_client_id
+  client_secret = var.databricks_client_secret
+  account_id    = var.databricks_account_id
 }
