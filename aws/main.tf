@@ -1,46 +1,18 @@
+// Environment module helps provision the following:
+// - Create the a Catalogs and associated cloud infrastructure for specific environment
+// - Enables System Schema for the workspace
+// - Create a Shared cluster per environment
+// - Assign Cluster policy to specific group 
 
-
-//Create the different groups and asssign them to the workspaces
-
-module "prod_sp_group" {
-  source                = "./users"
-  group_name            = "${local.prefix}-${var.group_1}"
-  databricks_account_id = var.databricks_account_id
-  client_id               = var.databricks_client_id
-  client_secret           = var.databricks_client_secret
-  databricks_workspace_id = var.databricks_workspace_id
-}
-
-module "developers_group" {
-  source                = "./users"
-  group_name            = "${local.prefix}-${var.group_2}"
-  databricks_account_id = var.databricks_account_id
-  client_id               = var.databricks_client_id
-  client_secret           = var.databricks_client_secret
-  databricks_workspace_id = var.databricks_workspace_id
-}
-
-module "sandbox_users_group" {
-  source                = "./users"
-  group_name            = "${local.prefix}-${var.group_3}"
-  databricks_account_id = var.databricks_account_id
-  client_id               = var.databricks_client_id
-  client_secret           = var.databricks_client_secret
-  databricks_workspace_id = var.databricks_workspace_id
-}
-
-
-// Create the Catalogs and associated cloud infrastructure
-
-// This creates a dev catalog with separate S3 Bucket and dedicated storage location
-module "dev_env" {
-  source = "./env"
+module "prod_environment" {
+  source = "./modules/environment"
 
   providers = {
-    aws        = aws
-    databricks = databricks
+    aws    = aws
+    databricks = databricks.workspace
   }
-  databricks_account_id = var.databricks_account_id
+
+  databricks_account_id  = var.databricks_account_id
   aws_account_id        = var.aws_account_id
   storage_prefix        = "${local.prefix}-${var.catalog_1}"
   tags                  = var.tags
@@ -49,22 +21,17 @@ module "dev_env" {
   external_location_name = "${local.prefix}-${var.catalog_1}"
 
   catalog_name = "${local.prefix}-${var.catalog_1}"
-
-  storage_credential_name = ""
-  storage_location_url    = ""
-  storage_root            = ""
-  iam_role_arn            = ""
 }
 
-// This creates a prod catalog with separate S3 Bucket and dedicated storage location
-module "prod_env" {
-  source = "./env"
+module "dev_environment" {
+  source = "./modules/environment"
 
   providers = {
-    aws        = aws
-    databricks = databricks
+    aws    = aws
+    databricks = databricks.workspace
   }
-  databricks_account_id = var.databricks_account_id
+
+  databricks_account_id  = var.databricks_account_id
   aws_account_id        = var.aws_account_id
   storage_prefix        = "${local.prefix}-${var.catalog_2}"
   tags                  = var.tags
@@ -73,22 +40,17 @@ module "prod_env" {
   external_location_name = "${local.prefix}-${var.catalog_2}"
 
   catalog_name = "${local.prefix}-${var.catalog_2}"
-
-  storage_credential_name = ""
-  storage_location_url    = ""
-  storage_root            = ""
-  iam_role_arn            = ""
 }
 
-// This creates a sandbox catalog with separate S3 Bucket and dedicated storage location
-module "sandbox_env" {
-  source = "./env"
+module "sandbox_environment" {
+  source = "./modules/environment"
 
   providers = {
-    aws        = aws
-    databricks = databricks
+    aws    = aws
+    databricks = databricks.workspace
   }
-  databricks_account_id = var.databricks_account_id
+
+  databricks_account_id  = var.databricks_account_id
   aws_account_id        = var.aws_account_id
   storage_prefix        = "${local.prefix}-${var.catalog_3}"
   tags                  = var.tags
@@ -97,56 +59,128 @@ module "sandbox_env" {
   external_location_name = "${local.prefix}-${var.catalog_3}"
 
   catalog_name = "${local.prefix}-${var.catalog_3}"
-
-  storage_credential_name = ""
-  storage_location_url    = ""
-  storage_root            = ""
-  iam_role_arn            = ""
 }
 
+#################################################################
+//Create the different groups and asssign them to the workspaces
 
+module "prod_sp_group" {
+  source                = "./modules/users"
+
+  providers = {
+    databricks = databricks.account
+  }
+  group_name            = "${local.prefix}-${var.group_1}"
+  databricks_workspace_id = var.databricks_workspace_id
+}
+
+module "developers_group" {
+  source                = "./modules/users"
+
+  providers = {
+    databricks = databricks.account
+  }
+  group_name            = "${local.prefix}-${var.group_2}"
+  databricks_workspace_id = var.databricks_workspace_id
+}
+
+module "sandbox_users_group" {
+  source                = "./modules/users"
+
+  providers = {
+    databricks = databricks.account
+  }
+  group_name            = "${local.prefix}-${var.group_3}"
+  databricks_workspace_id = var.databricks_workspace_id
+}
+
+#################################################################
 // Grant privileges
 
 module "grant_prod" {
-  source       = "./grant"
+  source       = "./modules/grants"
+
+  providers = {
+    databricks = databricks.workspace
+  }
+
   catalog_name = "${local.prefix}-${var.catalog_1}"
   permissions  = var.catalog_1_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
   group_3_name = "${local.prefix}-${var.group_3}"
-  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.prod_env]
+  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.prod_environment]
 }
 
 module "grant_dev" {
-  source       = "./grant"
+  source       = "./modules/grants"
+
+  providers = {
+    databricks = databricks.workspace
+  }
+
   catalog_name = "${local.prefix}-${var.catalog_2}"
   permissions  = var.catalog_2_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
   group_3_name = "${local.prefix}-${var.group_3}"
-  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.dev_env]
+  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.dev_environment]
 }
 
 
 module "grant_sandbox" {
-  source       = "./grant"
+  source       = "./modules/grants"
+
+  providers = {
+    databricks = databricks.workspace
+  }
+
   catalog_name = "${local.prefix}-${var.catalog_3}"
   permissions  = var.catalog_3_permissions
   group_1_name = "${local.prefix}-${var.group_1}"
   group_2_name = "${local.prefix}-${var.group_2}"
   group_3_name = "${local.prefix}-${var.group_3}"
-  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.sandbox_env]
+  depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.sandbox_environment]
 }
 
+#################################################################
+// Create Cluster and Cluster policies per group
 
-module "public_preview_system_table" {
-  source = "./system_schema"
-  databricks_host       = var.databricks_host
-  client_id               = var.databricks_client_id
-  client_secret           = var.databricks_client_secret
+module "prod_cluster" {
+  source = "./modules/compute"
+
+  providers = {
+    databricks = databricks.workspace
+  }
+
+  group_name = "${local.prefix}-${var.group_1}"
+  environment = var.catalog_1
+
+  depends_on   = [module.prod_sp_group, module.grant_prod]
 }
 
+module "dev_cluster" {
+  source = "./modules/compute"
 
-module "cluster_configuration" {
-  source = "./cluster_configuration"
+  providers = {
+    databricks = databricks.workspace
+  }
+
+  group_name = "${local.prefix}-${var.group_2}"
+  environment = var.catalog_2
+
+  depends_on   = [module.developers_group, module.grant_dev]
+}
+
+module "sandbox_cluster" {
+  source = "./modules/compute"
+
+  providers = {
+    databricks = databricks.workspace
+  }
+
+  group_name = "${local.prefix}-${var.group_3}"
+  environment = var.catalog_3
+
+  depends_on   = [module.sandbox_users_group, module.grant_sandbox]
 }
