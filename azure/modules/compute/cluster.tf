@@ -24,18 +24,29 @@ locals {
   }
 }
 
-resource "databricks_cluster_policy" "example" {
-  name       = "UC Quickstart Example Cluster Policy"
+resource "databricks_cluster_policy" "uc_qs_policy" {
+  name       = "UC Quickstart Policy - ${var.environment}"
   definition = jsonencode(local.default_policy)
+}
+
+resource "databricks_permissions" "policy_permission" {
+  cluster_policy_id = databricks_cluster_policy.uc_qs_policy.id
+  access_control {
+    group_name       = var.group_name
+    permission_level = "CAN_USE"
+  }
+  depends_on = [
+    databricks_cluster_policy.uc_qs_policy
+  ]
 }
 
 // Cluster Creation
 resource "databricks_cluster" "example" {
-  cluster_name       = "Shared Cluster"
+  cluster_name       = "UC Quickstart Cluster - ${var.environment}"
   data_security_mode = "USER_ISOLATION"
   spark_version      = data.databricks_spark_version.latest_lts.id
   node_type_id       = data.databricks_node_type.smallest.id
-  policy_id          = databricks_cluster_policy.example.id
+  policy_id          = databricks_cluster_policy.uc_qs_policy.id
 
   autoscale {
     min_workers = 1
@@ -43,6 +54,6 @@ resource "databricks_cluster" "example" {
   }
 
   depends_on = [
-    databricks_cluster_policy.example
+    databricks_cluster_policy.uc_qs_policy
   ]
 }

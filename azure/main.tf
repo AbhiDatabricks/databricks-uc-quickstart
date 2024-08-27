@@ -1,52 +1,11 @@
-// This creates a sandbox catalog with a seperate storage account, access_connector, storage credential and external location
-module "sandbox_catalog" {
-  source = "./modules/env"
+// Environment module helps provision the following:
+// - Create the Catalogs and associated cloud infrastructure for specific environment
+// - Enables System Schema for the workspace
 
-  providers = {
-    azurerm    = azurerm
-    databricks = databricks.workspace
-  }
-
-  access_connector_id    = ""
-  access_connector_name  = "${local.prefix}-${var.catalog_1}-databricks-mi"
-  resource_group         = var.resource_group
-  location               = var.location
-  storage_account_name   = "${local.dlsprefix}${var.catalog_1}acc"
-  tags                   = local.tags
-  storage_container_name = "${local.prefix}-${var.catalog_1}"
-
-  storage_credential_name = "${local.prefix}-${var.catalog_1}"
-  external_location_name  = "${local.prefix}-${var.catalog_1}"
-
-  catalog_name = "${local.prefix}-${var.catalog_1}"
-}
-
-// This creates a dev catalog with a seperate storage account, access_connector, storage credential and external location
-module "dev_catalog" {
-  source = "./modules/env"
-
-  providers = {
-    azurerm    = azurerm
-    databricks = databricks.workspace
-  }
-
-  access_connector_id    = ""
-  access_connector_name  = "${local.prefix}-${var.catalog_2}-databricks-mi"
-  resource_group         = var.resource_group
-  location               = var.location
-  storage_account_name   = "${local.dlsprefix}${var.catalog_2}acc"
-  tags                   = local.tags
-  storage_container_name = "${local.prefix}-${var.catalog_2}"
-
-  storage_credential_name = "${local.prefix}-${var.catalog_2}"
-  external_location_name  = "${local.prefix}-${var.catalog_2}"
-
-  catalog_name = "${local.prefix}-${var.catalog_2}"
-}
 
 // This creates a prod catalog with a seperate storage account, access_connector, storage credential and external location
 module "prod_catalog" {
-  source = "./modules/env"
+  source = "./modules/environment"
 
   providers = {
     azurerm    = azurerm
@@ -67,7 +26,56 @@ module "prod_catalog" {
   catalog_name = "${local.prefix}-${var.catalog_3}"
 }
 
-// 
+// This creates a dev catalog with a seperate storage account, access_connector, storage credential and external location
+module "dev_catalog" {
+  source = "./modules/environment"
+
+  providers = {
+    azurerm    = azurerm
+    databricks = databricks.workspace
+  }
+
+  access_connector_id    = ""
+  access_connector_name  = "${local.prefix}-${var.catalog_2}-databricks-mi"
+  resource_group         = var.resource_group
+  location               = var.location
+  storage_account_name   = "${local.dlsprefix}${var.catalog_2}acc"
+  tags                   = local.tags
+  storage_container_name = "${local.prefix}-${var.catalog_2}"
+
+  storage_credential_name = "${local.prefix}-${var.catalog_2}"
+  external_location_name  = "${local.prefix}-${var.catalog_2}"
+
+  catalog_name = "${local.prefix}-${var.catalog_2}"
+}
+
+
+// This creates a sandbox catalog with a seperate storage account, access_connector, storage credential and external location
+module "sandbox_catalog" {
+  source = "./modules/environment"
+
+  providers = {
+    azurerm    = azurerm
+    databricks = databricks.workspace
+  }
+
+  access_connector_id    = ""
+  access_connector_name  = "${local.prefix}-${var.catalog_1}-databricks-mi"
+  resource_group         = var.resource_group
+  location               = var.location
+  storage_account_name   = "${local.dlsprefix}${var.catalog_1}acc"
+  tags                   = local.tags
+  storage_container_name = "${local.prefix}-${var.catalog_1}"
+
+  storage_credential_name = "${local.prefix}-${var.catalog_1}"
+  external_location_name  = "${local.prefix}-${var.catalog_1}"
+
+  catalog_name = "${local.prefix}-${var.catalog_1}"
+}
+
+#################################################################
+//Create the different groups and asssign them to the workspaces
+
 module "prod_sp_group" {
   source = "./modules/users"
 
@@ -119,10 +127,11 @@ module "sandbox_users_group" {
   azure_tenant_id         = var.azure_tenant_id
 }
 
+#################################################################
 // Grant privileges
 
 module "grant_prod" {
-  source       = "./modules/grant"
+  source       = "./modules/grants"
   providers = {
     databricks = databricks.workspace
   }
@@ -135,7 +144,7 @@ module "grant_prod" {
 }
 
 module "grant_dev" {
-  source       = "./modules/grant"
+  source       = "./modules/grants"
   providers = {
     databricks = databricks.workspace
   }
@@ -148,7 +157,7 @@ module "grant_dev" {
 }
 
 module "grant_sandbox" {
-  source       = "./modules/grant"
+  source       = "./modules/grants"
   providers = {
     databricks = databricks.workspace
   }
@@ -160,16 +169,44 @@ module "grant_sandbox" {
   depends_on   = [module.sandbox_users_group, module.developers_group, module.prod_sp_group, module.sandbox_catalog]
 }
 
-module "system_schema" {
-  source = "./modules/system_schema"
+#################################################################
+// Create Cluster and Cluster policies per group
+
+module "prod_cluster" {
+  source = "./modules/compute"
+
   providers = {
     databricks = databricks.workspace
   }
+
+  group_name = "${local.prefix}-${var.group_1}"
+  environment = var.catalog_1
+
+  depends_on   = [module.prod_sp_group, module.grant_prod]
 }
 
-module "cluster_configuration" {
-  source = "./modules/cluster_configuration"
+module "dev_cluster" {
+  source = "./modules/compute"
+
   providers = {
     databricks = databricks.workspace
   }
+
+  group_name = "${local.prefix}-${var.group_2}"
+  environment = var.catalog_2
+
+  depends_on   = [module.developers_group, module.grant_dev]
+}
+
+module "sandbox_cluster" {
+  source = "./modules/compute"
+
+  providers = {
+    databricks = databricks.workspace
+  }
+
+  group_name = "${local.prefix}-${var.group_3}"
+  environment = var.catalog_3
+
+  depends_on   = [module.sandbox_users_group, module.grant_sandbox]
 }
