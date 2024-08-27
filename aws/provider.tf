@@ -17,12 +17,14 @@ provider "aws" {
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
   # Include the aws_session_token if the temporary credential is used
-  token = var.aws_session_token
+  # token = var.aws_session_token
 }
 
 // initialize provider at account level for provisioning workspace with AWS PrivateLink
 provider "databricks" {
   # profile = "db-aws"
   host  = var.databricks_host
-  token = var.databricks_token
+  # token = var.databricks_token
+  client_id     = var.databricks_client_id
+  client_secret = var.databricks_client_secret
 }
