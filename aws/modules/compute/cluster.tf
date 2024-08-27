@@ -20,10 +20,6 @@ locals {
       "type" : "fixed",
       "value" : 60,
       "hidden" : true
-    },
-    "max_clusters_per_user" : {
-      "type": "fixed",
-      "value": 5
     }
   }
 }
