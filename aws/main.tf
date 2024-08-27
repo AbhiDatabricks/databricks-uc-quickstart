@@ -1,5 +1,5 @@
 // Environment module helps provision the following:
-// - Create the a Catalogs and associated cloud infrastructure for specific environment
+// - Create the Catalogs and associated cloud infrastructure for specific environment
 // - Enables System Schema for the workspace
 
 module "prod_environment" {
