@@ -19,8 +19,3 @@ resource "databricks_system_schema" "marketplace" {
 resource "databricks_system_schema" "storage" {
   schema = "storage"
 }
-
-# resource "databricks_system_schema" "workflow" {
-#   provider     = databricks
-#   schema = "workflow"
-# }
