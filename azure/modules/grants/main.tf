@@ -14,3 +14,23 @@ resource "databricks_grants" "this" {
   }
 }
 
+data "databricks_catalog" "system_catalog" {
+  name = "system"
+}
+
+data "databricks_schemas" "system_schemas" {
+  catalog_name = "system"
+}
+
+resource "databricks_grant" "system_catalog" {
+  catalog = data.databricks_catalog.system_catalog.name
+  principal  = var.group_1_name
+  privileges = ["USE_CATALOG"]
+}
+
+resource "databricks_grant" "system_schemas" {
+  for_each = toset(data.databricks_schemas.system_schemas.ids)
+  schema = "${each.key}"
+  principal  = var.group_1_name
+  privileges = ["USE_SCHEMA", "SELECT"]
+}
