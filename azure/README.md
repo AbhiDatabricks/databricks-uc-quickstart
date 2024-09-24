@@ -43,7 +43,7 @@ resource_group           = "" // The resource group where storage accounts & acc
 
 ```
 
-Note: Azure and Databricks creds can be injected as environment variables if required. Approach adopted here is for ease of switching environments while testing.
+Note: Azure and Databricks credentials can be injected as environment variables if required. Approach adopted here is for ease of switching environments while testing.
 
 ## 2. **Provide expected catalog names as input**
 
