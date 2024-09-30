@@ -182,3 +182,20 @@ module "sandbox_cluster" {
 
   depends_on   = [module.sandbox_users_group, module.grant_sandbox]
 }
+
+module "system_schema" {
+  source                = "./modules/system_schema"
+  providers = {
+    databricks = databricks.workspace
+  }
+}
+
+module "grant_system_schema" {
+  source       = "./modules/grant_system_schema"
+  providers = {
+    databricks = databricks.workspace
+  }
+
+  group_1_name = "${local.prefix}-${var.group_1}"
+  depends_on   = [module.system_schema]
+}
