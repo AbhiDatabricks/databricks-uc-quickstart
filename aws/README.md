@@ -4,13 +4,18 @@
 
 Copy the file `template.tfvars.example` and name it `db.tffvar`
 
+Minimum Permissions for bootstrap SP :
+
+a) Workspace Admin
+b) Create Catalog Permisions
+
 Update the configuration with the relavant entries:
 
 ```
 #Databricks credentials
 databricks_account_id    = "XXX" // Databricks account ID.
 databricks_host          = "https://xxx.cloud.databricks.com" // The URL of the workspace used for UC deployment
-databricks_token         = "XXX" // The personal access token of the service pricipal used to provision the resources in the Databricks workspace ### TODO is it still used?
+databricks_token(Optional)         = "XXX" // The personal access token of the service pricipal used to provision the resources in the Databricks workspace ### 
 databricks_client_id     = "XXX" // Service principal ID for Databricks with admin permissions.
 databricks_client_secret = "XXX" // Secret for the corresponding service principal.
 databricks_workspace_id  = "XX" // The ID of the workspace to enable Unity Catalog
