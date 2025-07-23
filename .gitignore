@@ -6,3 +6,4 @@
 *.DS_Store
 .vscode
 *.tfplan
+settings.local.json
