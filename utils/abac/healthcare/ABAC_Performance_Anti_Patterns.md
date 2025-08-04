@@ -185,39 +185,11 @@ RETURN
 
 **Performance Impact:** 🔥 **1,000x slower** (2 lookups per row)
 
----
 
-### ❌ Anti-Pattern #7: Time-Based Filters with Function Calls
-
-**What NOT to Do:**
-```sql
--- NEVER DO THIS - Complex time calculation per row
-CREATE OR REPLACE FUNCTION filter_business_hours_complex()
-RETURNS BOOLEAN
-DETERMINISTIC
-RETURN 
-  CASE 
-    WHEN EXTRACT(DOW FROM current_timestamp()) IN (1,7) THEN FALSE  -- Weekend
-    WHEN EXTRACT(HOUR FROM CONVERT_TIMEZONE('America/New_York', current_timestamp())) NOT BETWEEN 8 AND 17 THEN FALSE
-    WHEN EXISTS (
-      SELECT 1 FROM company.holidays 
-      WHERE holiday_date = CAST(current_timestamp() AS DATE)
-    ) THEN FALSE
-    ELSE TRUE
-  END;
-```
-
-**Why This Kills Performance:**
-- Timezone conversion per row
-- Holiday lookup per row
-- Multiple function calls
-- Prevents predicate pushdown
-
-**Performance Impact:** 🔥 **100x slower** (Multiple calculations per row)
 
 ---
 
-### ❌ Anti-Pattern #8: Dynamic SQL Generation
+### ❌ Anti-Pattern #7: Dynamic SQL Generation
 
 **What NOT to Do:**
 ```sql
@@ -248,7 +220,7 @@ RETURN
 
 ---
 
-### ⚠️ Anti-Pattern #9: Non-Deterministic Functions (Use With Extreme Caution)
+### ⚠️ Anti-Pattern #8: Non-Deterministic Functions (Use With Extreme Caution)
 
 **What to Be Careful With:**
 ```sql
