@@ -382,8 +382,7 @@ FROM test_data;
 
 ### **Performance Targets**
 
-- **Mask Functions**: >100,000 rows/second
-- **Row Filters**: >500,000 rows/second  
+ 
 - **Query Overhead**: <10% additional latency
 - **Memory Usage**: <2x baseline query
 
