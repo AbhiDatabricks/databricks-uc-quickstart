@@ -116,7 +116,7 @@ REF_ghi789... | L*** | T*** | TX | All Patients Query
 
 ---
 
-## 🎭 Field Trick #4: The "Time Travel" Demo
+## 🎭 Field Trick #4: The "Time Restriction" Demo
 
 ### **The Setup**
 Show how the same user gets different access at different times.
