@@ -1,4 +1,4 @@
-# 🎯 ABAC in the Real World: Field Tricks for Healthcare Demos
+# 🎯 ABAC in the Real World: Field Tips and Tricks for ABAC Demos
 
 ## 🎪 The Art of Demo Mastery
 
