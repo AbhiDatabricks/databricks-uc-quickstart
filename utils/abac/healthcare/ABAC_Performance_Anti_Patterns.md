@@ -120,8 +120,6 @@ RETURN
 
 **Why This Destroys Performance:**
 - Metadata queries for every row
-- System table locks
-- No optimization by query planner
 - Breaks parallelization
 
 **Performance Impact:** 🔥 **500x slower** (System table lookup per row)
