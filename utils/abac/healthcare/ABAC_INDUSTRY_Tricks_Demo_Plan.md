@@ -162,18 +162,9 @@ Show limited results due to time-based policy, then explain:
 Show the audit trail that gets created automatically.
 
 ### **The Script**
-> *"Every query we just ran created an audit record. Let me show you what your compliance officer will see..."*
+> *"Every query we just ran created an audit record and is trackable !"*
 
-**The Audit View:**
-```
-User: junior_staff_user
-Query: SELECT PatientID, FirstName FROM Patients
-Time: 2025-07-23 03:37:13
-Policy Applied: apscat_healthcare_junior_name_masking
-Data Masked: FirstName, LastName
-Reason: User in Junior_Staff group
-Compliance: HIPAA-compliant - PHI protected
-```
+
 
 ### **The Relief Moment**
 > *"Your next audit just got 95% easier. Every access decision is logged, every policy application is tracked, every compliance requirement is automatically documented. Your auditors will love you."*
