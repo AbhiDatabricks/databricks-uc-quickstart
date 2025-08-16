@@ -20,7 +20,7 @@ RETURNS STRING
 DETERMINISTIC
 RETURN 
   CASE 
-    WHEN is_member('sensitive_data_group') THEN input_value
+    WHEN data_sensitivity = 'LOW' THEN input_value
     ELSE (SELECT response FROM external_api_call('https://masking-service.com/api/mask', input_value))
   END;
 ```
@@ -77,7 +77,7 @@ RETURNS STRING
 DETERMINISTIC
 RETURN 
   CASE 
-    WHEN is_member('doctor_group') THEN medical_notes
+    WHEN access_level = 'DOCTOR' THEN medical_notes
     ELSE REGEXP_REPLACE(
       REGEXP_REPLACE(
         REGEXP_REPLACE(medical_notes, '\\d{3}-\\d{2}-\\d{4}', 'XXX-XX-XXXX'),  -- SSN
@@ -120,6 +120,8 @@ RETURN
 
 **Why This Destroys Performance:**
 - Metadata queries for every row
+- System table locks
+- No optimization by query planner
 - Breaks parallelization
 
 **Performance Impact:** 🔥 **500x slower** (System table lookup per row)
@@ -133,7 +135,7 @@ RETURN
 **What NOT to Do:**
 ```sql
 -- NEVER DO THIS - Complex JOIN in row filter
-CREATE OR REPLACE FUNCTION filter_based_on_provider_network()
+CREATE OR REPLACE FUNCTION filter_based_on_provider_network(provider_id STRING)
 RETURNS BOOLEAN
 DETERMINISTIC
 RETURN 
@@ -142,8 +144,8 @@ RETURN
     FROM healthcare.providers p
     JOIN healthcare.provider_networks pn ON p.providerid = pn.providerid
     JOIN healthcare.user_network_access una ON pn.networkid = una.networkid
-    WHERE una.username = current_user()
-      AND p.providerid = healthcare.visits.providerid  -- This breaks optimization!
+    WHERE una.user_region = 'SOME_REGION'
+      AND p.providerid = provider_id  -- This breaks optimization!
   );
 ```
 
@@ -162,18 +164,18 @@ RETURN
 **What NOT to Do:**
 ```sql
 -- NEVER DO THIS - User lookup for every row
-CREATE OR REPLACE FUNCTION filter_by_user_clearance_level()
+CREATE OR REPLACE FUNCTION filter_by_user_clearance_level(patient_id STRING)
 RETURNS BOOLEAN
 DETERMINISTIC
 RETURN 
   (
     SELECT clearance_level 
     FROM user_management.user_attributes 
-    WHERE username = current_user()
+    WHERE username = 'SOME_USER'
   ) >= (
     SELECT required_clearance 
     FROM healthcare.patient_security_levels 
-    WHERE patientid = healthcare.patients.patientid
+    WHERE patientid = patient_id
   );
 ```
 
@@ -185,11 +187,39 @@ RETURN
 
 **Performance Impact:** 🔥 **1,000x slower** (2 lookups per row)
 
+---
 
+### ❌ Anti-Pattern #7: Time-Based Filters with Function Calls
+
+**What NOT to Do:**
+```sql
+-- NEVER DO THIS - Complex time calculation per row
+CREATE OR REPLACE FUNCTION filter_business_hours_complex()
+RETURNS BOOLEAN
+DETERMINISTIC
+RETURN 
+  CASE 
+    WHEN EXTRACT(DOW FROM current_timestamp()) IN (1,7) THEN FALSE  -- Weekend
+    WHEN EXTRACT(HOUR FROM CONVERT_TIMEZONE('America/New_York', current_timestamp())) NOT BETWEEN 8 AND 17 THEN FALSE
+    WHEN EXISTS (
+      SELECT 1 FROM company.holidays 
+      WHERE holiday_date = CAST(current_timestamp() AS DATE)
+    ) THEN FALSE
+    ELSE TRUE
+  END;
+```
+
+**Why This Kills Performance:**
+- Timezone conversion per row
+- Holiday lookup per row
+- Multiple function calls
+- Prevents predicate pushdown
+
+**Performance Impact:** 🔥 **100x slower** (Multiple calculations per row)
 
 ---
 
-### ❌ Anti-Pattern #7: Dynamic SQL Generation
+### ❌ Anti-Pattern #8: Dynamic SQL Generation
 
 **What NOT to Do:**
 ```sql
@@ -199,12 +229,12 @@ RETURNS BOOLEAN
 DETERMINISTIC
 RETURN 
   CASE 
-    WHEN current_user() LIKE '%_admin' THEN TRUE
+    WHEN user_role = 'ADMIN' THEN TRUE
     ELSE (
       -- This conceptually represents dynamic SQL - DON'T DO THIS
       SELECT COUNT(*) > 0
       FROM healthcare.dynamic_permissions
-      WHERE CONTAINS(permission_sql, current_user())
+      WHERE CONTAINS(permission_sql, 'ADMIN')
         AND CONTAINS(permission_sql, 'patients')
     )
   END;
@@ -220,7 +250,7 @@ RETURN
 
 ---
 
-### ⚠️ Anti-Pattern #8: Non-Deterministic Functions (Use With Extreme Caution)
+### ⚠️ Anti-Pattern #9: Non-Deterministic Functions (Use With Extreme Caution)
 
 **What to Be Careful With:**
 ```sql
@@ -230,7 +260,7 @@ RETURNS STRING
 NOT DETERMINISTIC  -- Customer may explicitly want this!
 RETURN 
   CASE 
-    WHEN is_member('full_access_group') THEN input_value
+    WHEN access_level IN ('ADMIN', 'MANAGER') THEN input_value
     ELSE CONCAT('MASKED_', CAST(RAND() * 1000000 AS INT))
   END;
 ```
@@ -263,7 +293,7 @@ RETURNS STRING
 DETERMINISTIC
 RETURN 
   CASE 
-    WHEN is_member('full_access_group') THEN input_value
+    WHEN access_level IN ('ADMIN', 'MANAGER') THEN input_value
     ELSE CONCAT('MASKED_', SHA2(CONCAT(input_value, DATE_FORMAT(current_date(), 'yyyy-MM-dd')), 256))
   END;
 ```
@@ -272,53 +302,237 @@ RETURN
 
 ---
 
+## ✅ PURE DATA-DRIVEN PATTERNS
+
+### 🎯 Column-Based Logic Only
+
+ABAC functions should focus purely on **data attributes and column values**. Unity Catalog policies handle user/group assignment separately, so functions only need to evaluate data properties.
+
+**✅ EXCELLENT Pattern - Geographic Data Filtering:**
+
+```sql
+-- ✅ BEST PRACTICE - Pure column-based logic
+CREATE OR REPLACE FUNCTION filter_by_country_access(ca_country STRING, data_classification STRING)
+RETURNS BOOLEAN
+RETURN 
+  CASE
+    WHEN data_classification = 'PUBLIC' THEN TRUE
+    WHEN ca_country IN ('Australia', 'New Zealand') AND data_classification = 'REGIONAL' THEN TRUE
+    WHEN ca_country IN ('Canada', 'United States') AND data_classification = 'NORTH_AMERICA' THEN TRUE
+    WHEN ca_country = 'Global' AND data_classification = 'INTERNATIONAL' THEN TRUE
+    ELSE FALSE
+  END;
+```
+
+**✅ EXCELLENT Pattern - Data Classification Masking:**
+
+```sql
+-- ✅ BEST PRACTICE - Data sensitivity drives masking decisions
+CREATE OR REPLACE FUNCTION mask_based_on_sensitivity(data_value STRING, sensitivity_level STRING, department STRING)
+RETURNS STRING
+RETURN 
+  CASE
+    WHEN sensitivity_level = 'PUBLIC' THEN data_value
+    WHEN sensitivity_level = 'INTERNAL' AND department IN ('HR', 'ADMIN') THEN data_value
+    WHEN sensitivity_level = 'INTERNAL' THEN 'INTERNAL_DATA'
+    WHEN sensitivity_level = 'CONFIDENTIAL' AND department = 'EXECUTIVE' THEN data_value
+    WHEN sensitivity_level = 'CONFIDENTIAL' THEN 'CONFIDENTIAL'
+    WHEN sensitivity_level = 'RESTRICTED' THEN 'RESTRICTED'
+    ELSE 'CLASSIFIED'
+  END;
+```
+
+**Why This Works:**
+- ✅ **Pure column logic** - business rules based only on data attributes
+- ✅ **No external dependencies** - function evaluates only input parameters
+- ✅ **Policy-level access control** - Unity Catalog handles who can use which functions
+- ✅ **Maximum performance** - no lookups, no external calls
+- ✅ **Clear business logic** - easy to understand data classification rules
+
+---
+
 ## ✅ PERFORMANCE BEST PRACTICES
 
 ### 🚀 High-Performance Mask Function Pattern
 
 ```sql
--- ✅ EXCELLENT - Simple, deterministic, fast
-CREATE OR REPLACE FUNCTION mask_patient_id_fast(patient_id STRING)
+-- ✅ EXCELLENT - Pure column-driven logic
+CREATE OR REPLACE FUNCTION mask_patient_data_by_classification(
+  patient_data STRING, 
+  classification STRING,
+  department STRING,
+  access_level STRING
+)
 RETURNS STRING
 DETERMINISTIC
 RETURN 
   CASE 
-    WHEN is_member('healthcare_analyst') THEN CONCAT('REF_', SHA2(patient_id, 256))
-    WHEN is_member('junior_staff') THEN 'MASKED_ID'
-    WHEN is_member('senior_doctor') THEN patient_id
-    ELSE 'UNAUTHORIZED'
+    -- Business logic based purely on data attributes
+    WHEN classification = 'PUBLIC' THEN patient_data
+    WHEN classification = 'GENERAL' AND department IN ('ADMIN', 'BILLING') THEN patient_data
+    WHEN classification = 'MEDICAL' AND access_level = 'MEDICAL_STAFF' THEN patient_data
+    WHEN classification = 'MEDICAL' THEN CONCAT('MED_', SHA2(patient_data, 256))
+    WHEN classification = 'SENSITIVE' AND access_level = 'SENIOR_STAFF' THEN patient_data
+    WHEN classification = 'SENSITIVE' THEN 'SENSITIVE_DATA'
+    ELSE 'CLASSIFIED'
+  END;
+```
+
+**Alternative Pattern - Geographic Access Control:**
+```sql
+-- ✅ EXCELLENT - Location-based data access logic
+CREATE OR REPLACE FUNCTION mask_by_region_and_clearance(
+  data_value STRING,
+  patient_region STRING,
+  data_sensitivity STRING,
+  user_region_clearance STRING
+)
+RETURNS STRING
+DETERMINISTIC
+RETURN 
+  CASE 
+    WHEN data_sensitivity = 'LOW' THEN data_value
+    WHEN data_sensitivity = 'MEDIUM' AND patient_region = user_region_clearance THEN data_value
+    WHEN data_sensitivity = 'MEDIUM' THEN CONCAT('REG_', LEFT(SHA2(data_value, 256), 8))
+    WHEN data_sensitivity = 'HIGH' AND patient_region = user_region_clearance AND user_region_clearance IN ('US_WEST', 'US_EAST') THEN data_value
+    WHEN data_sensitivity = 'HIGH' THEN 'HIGH_SECURITY_DATA'
+    ELSE 'RESTRICTED'
+  END;
+```
+
+**Ultra-Fast Pattern - Pure Data Attributes:**
+```sql
+-- ✅ FASTEST - Pure data-driven logic, maximum performance
+CREATE OR REPLACE FUNCTION mask_by_data_attributes(
+  data_value STRING,
+  is_public BOOLEAN,
+  risk_level INT,
+  expiry_date DATE
+)
+RETURNS STRING  
+DETERMINISTIC
+RETURN
+  CASE
+    WHEN is_public = TRUE THEN data_value
+    WHEN expiry_date < current_date() THEN 'EXPIRED_DATA'
+    WHEN risk_level <= 2 THEN CONCAT('LOW_', LEFT(data_value, 3), '***')
+    WHEN risk_level <= 4 THEN CONCAT('MED_', SHA2(data_value, 256))
+    ELSE 'HIGH_RISK_DATA'
   END;
 ```
 
 **Why This Works:**
-- ✅ Simple CASE statement
-- ✅ Built-in functions only
-- ✅ Deterministic results
-- ✅ No external dependencies
+- ✅ **Pure data attribute logic** - business rules based only on column values
+- ✅ **No external dependencies** - function evaluates only input parameters
+- ✅ **Maximum performance** - no lookups, no function calls, no external checks
+- ✅ **Policy-level access control** - Unity Catalog handles user/group targeting
+- ✅ **Clear business rules** - easy to understand and maintain
+- ✅ **Optimizable by Spark** - column-based predicates allow full pushdown optimization
 
 ---
 
 ### 🚀 High-Performance Row Filter Pattern
 
 ```sql
--- ✅ EXCELLENT - Simple boolean logic
-CREATE OR REPLACE FUNCTION filter_by_region_fast()
+-- ✅ EXCELLENT - Pure column-driven filtering logic
+CREATE OR REPLACE FUNCTION filter_by_region_and_clearance(
+  patient_region STRING,
+  clearance_required STRING,
+  user_clearance_level STRING,
+  user_region_access STRING
+)
 RETURNS BOOLEAN
 DETERMINISTIC
 RETURN 
   CASE 
-    WHEN is_member('admin_group') THEN TRUE
-    WHEN is_member('texas_regional') AND (state = 'TX' OR state = 'texas') THEN TRUE
-    WHEN is_member('california_regional') AND (state = 'CA' OR state = 'california') THEN TRUE
+    -- No restrictions for public data
+    WHEN clearance_required = 'NONE' THEN TRUE
+    
+    -- Regional access based on user clearance and region match
+    WHEN clearance_required = 'STANDARD' THEN
+      CASE
+        WHEN user_clearance_level IN ('STANDARD', 'HIGH') AND patient_region = user_region_access THEN TRUE
+        WHEN user_clearance_level = 'GLOBAL' THEN TRUE
+        ELSE FALSE
+      END
+      
+    -- High-clearance requires elevated access level
+    WHEN clearance_required = 'HIGH' THEN
+      CASE
+        WHEN user_clearance_level = 'HIGH' AND patient_region = user_region_access THEN TRUE
+        WHEN user_clearance_level = 'GLOBAL' THEN TRUE
+        ELSE FALSE
+      END
+      
+    ELSE FALSE
+  END;
+```
+
+**Alternative Pattern - Time-Based Data Access:**
+```sql
+-- ✅ EXCELLENT - Temporal and data-driven access control
+CREATE OR REPLACE FUNCTION filter_by_time_and_urgency(
+  case_urgency STRING,
+  created_time TIMESTAMP,
+  user_schedule_type STRING,
+  current_hour INT
+)
+RETURNS BOOLEAN
+DETERMINISTIC
+RETURN 
+  CASE 
+    -- Emergency cases - accessible based on user schedule type
+    WHEN case_urgency = 'EMERGENCY' AND user_schedule_type = 'EMERGENCY' THEN TRUE
+    
+    -- Urgent cases - accessible during business hours or after-hours staff
+    WHEN case_urgency = 'URGENT' THEN
+      CASE
+        WHEN current_hour BETWEEN 8 AND 18 AND user_schedule_type IN ('STANDARD', 'AFTER_HOURS') THEN TRUE
+        WHEN user_schedule_type = 'AFTER_HOURS' THEN TRUE
+        ELSE FALSE
+      END
+      
+    -- Standard cases - business hours only
+    WHEN case_urgency = 'STANDARD' THEN
+      CASE
+        WHEN current_hour BETWEEN 8 AND 17 AND user_schedule_type IN ('STANDARD', 'AFTER_HOURS') THEN TRUE
+        ELSE FALSE
+      END
+      
+    ELSE FALSE
+  END;
+```
+
+**Ultra-Fast Pattern - Pure Data Logic:**
+```sql
+-- ✅ FASTEST - Pure column logic, maximum performance
+CREATE OR REPLACE FUNCTION filter_by_data_properties(
+  is_public_record BOOLEAN,
+  data_classification STRING,
+  expiry_date DATE,
+  access_level_required STRING,
+  user_access_level STRING
+)
+RETURNS BOOLEAN
+DETERMINISTIC
+RETURN 
+  CASE 
+    WHEN is_public_record = TRUE THEN TRUE
+    WHEN expiry_date < current_date() THEN FALSE
+    WHEN data_classification = 'GENERAL' AND user_access_level IN ('GENERAL', 'ELEVATED', 'ADMIN') THEN TRUE
+    WHEN data_classification = 'RESTRICTED' AND user_access_level IN ('ELEVATED', 'ADMIN') THEN TRUE
+    WHEN data_classification = 'CLASSIFIED' AND user_access_level = 'ADMIN' THEN TRUE
     ELSE FALSE
   END;
 ```
 
 **Why This Works:**
-- ✅ Simple boolean logic
-- ✅ Column references only
-- ✅ Allows predicate pushdown
-- ✅ Vectorizable operations
+- ✅ **Pure column comparisons** - business rules based only on data attributes
+- ✅ **No external function calls** - all logic contained within CASE statements
+- ✅ **Maximum performance** - no lookups, no user/group resolution
+- ✅ **Policy-level targeting** - Unity Catalog handles user/group assignment
+- ✅ **Predicate pushdown friendly** - Spark can optimize column comparisons
+- ✅ **Vectorizable operations** - batch processing of data with similar attributes
 
 ---
 
@@ -337,13 +551,14 @@ RETURN
 
 ## 🎯 Golden Rules for ABAC Performance
 
-### **The 5 Commandments**
+### **The 6 Commandments**
 
 1. **Keep It Simple**: Simple logic = fast execution
 2. **Stay Deterministic**: Same input = same output, always
 3. **Avoid External Calls**: No network, no external systems
 4. **Use Built-ins Only**: Leverage optimized Spark functions
-5. **Test at Scale**: 1 million rows minimum for realistic testing
+5. **Pure Column Logic**: Functions should only evaluate input parameters and data attributes
+6. **Test at Scale**: 1 million rows minimum for realistic testing
 
 ### **The Performance Checklist**
 
@@ -353,6 +568,8 @@ Before deploying any ABAC function, ask:
 - [ ] Is the logic deterministic and predictable?
 - [ ] Can this be evaluated without external data lookups?
 - [ ] Will this allow Spark to optimize the query plan?
+- [ ] Does the function only use input parameters and column values?
+- [ ] Are there no user/group membership function calls within the logic?
 - [ ] Have I tested this with realistic data volumes?
 
 ---
@@ -382,7 +599,8 @@ FROM test_data;
 
 ### **Performance Targets**
 
- 
+- **Mask Functions**: >100,000 rows/second
+- **Row Filters**: >500,000 rows/second  
 - **Query Overhead**: <10% additional latency
 - **Memory Usage**: <2x baseline query
 
