@@ -57,9 +57,6 @@ terraform apply
 
 Once deployment is complete, verify the setup directly within your Databricks workspace to ensure all components are correctly configured.
 
-## 📖 Documentation
-
-Explore detailed customization guides and additional usage scenarios on our [Wiki](https://github.com/yourusername/databricks-uc-quickstart/wiki).
 
 ## 🤝 Contributing
 
