@@ -57,3 +57,13 @@ resource "databricks_cluster" "example" {
     databricks_cluster_policy.uc_qs_policy
   ]
 }
+
+// Cluster Access Control
+resource "databricks_permissions" "cluster_usage" {
+  cluster_id = databricks_cluster.example.id
+
+  access_control {
+    group_name       = var.group_name
+    permission_level = "CAN_MANAGE"
+  }
+}
